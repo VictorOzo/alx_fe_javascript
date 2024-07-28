@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		document.getElementById('newQuoteCategory').value = '';
 		alert('Quote added successfully!');
 	}
-	
+
 	// Function to export quotes as a JSON file
 	function exportQuotes() {
 		const blob = new Blob([JSON.stringify(quotes, null, 2)], {
@@ -64,6 +64,27 @@ document.addEventListener('DOMContentLoaded', () => {
 		a.download = 'quotes.json';
 		a.click();
 		URL.revokeObjectURL(url);
+	}
+	// Function to import quotes from a JSON file
+	function importFromJsonFile(event) {
+		const fileReader = new FileReader();
+		fileReader.onload = function (event) {
+			try {
+				const importedQuotes = JSON.parse(event.target.result);
+				if (Array.isArray(importedQuotes)) {
+					quotes.length = 0; // Clear existing quotes
+					quotes.push(...importedQuotes);
+					saveQuotes();
+					showRandomQuote();
+					alert('Quotes imported successfully!');
+				} else {
+					alert('Invalid JSON format.');
+				}
+			} catch (error) {
+				alert('Error parsing JSON file.');
+			}
+		};
+		fileReader.readAsText(event.target.files[0]);
 	}
 
 	// Event listener for the "Export Quotes" button
