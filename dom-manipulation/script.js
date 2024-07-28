@@ -1,94 +1,148 @@
-document.addEventListener('DOMContentLoaded', toDoFunc);
+document.addEventListener('DOMContentLoaded', () => {
+	let quotes = JSON.parse(localStorage.getItem('quotes')) || [
+		{
+			text: 'The best way to predict the future is to invent it.',
+			category: 'Inspiration',
+		},
+		{
+			text: 'Life is 10% what happens to us and 90% how we react to it.',
+			category: 'Life',
+		},
+		{
+			text: "Your time is limited, don't waste it living someone else's life.",
+			category: 'Motivation',
+		},
+	];
 
-function toDoFunc() {
-	// Select DOM elements
-	const addButton = document.getElementById('add-task-btn');
-	const taskInput = document.getElementById('task-input');
-	const taskList = document.getElementById('task-list');
-
-	// Function to add a task
-	function addTask() {
-		const taskText = taskInput.value.trim();
-
-		if (taskText === '') {
-			alert('Please enter a task');
-			return;
-		}
-
-		// Create list item and remove button
-		const listItem = document.createElement('li');
-		listItem.textContent = taskText;
-
-		const removeButton = document.createElement('button');
-		removeButton.textContent = 'Remove';
-		removeButton.classList.add('remove-btn');
-
-		// Remove task function
-		removeButton.onclick = function () {
-			taskList.removeChild(listItem);
-		};
-
-		// Append elements to the DOM
-		listItem.appendChild(removeButton);
-		taskList.appendChild(listItem);
-
-		// Clear input field
-		taskInput.value = '';
+	function saveQuotes() {
+		localStorage.setItem('quotes', JSON.stringify(quotes));
 	}
 
-	// Event listeners
-	addButton.addEventListener('click', addTask);
-	taskInput.addEventListener('keypress', (event) => {
-		if (event.key === 'Enter') {
-			addTask();
+	function displayRandomQuote() {
+		const filteredQuotes = getFilteredQuotes();
+		if (filteredQuotes.length > 0) {
+			const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+			const quoteDisplay = document.getElementById('quoteDisplay');
+			quoteDisplay.innerText = `${filteredQuotes[randomIndex].text} - ${filteredQuotes[randomIndex].category}`;
+			sessionStorage.setItem(
+				'lastQuote',
+				JSON.stringify(filteredQuotes[randomIndex])
+			);
+		} else {
+			document.getElementById('quoteDisplay').innerText =
+				'No quotes available for this category.';
 		}
-	});
+	}
 
-	// Initial task (optional)
-	addTask(); // Uncomment to add an initial task
-}
+	function getFilteredQuotes() {
+		const selectedCategory =
+			localStorage.getItem('selectedCategory') || 'all';
+		if (selectedCategory === 'all') {
+			return quotes;
+		} else {
+			return quotes.filter((quote) => quote.category === selectedCategory);
+		}
+	}
 
-// document.addEventListener('DOMContentLoaded', () => {
-// 	const addButton = document.getElementById('add-task-btn');
-// 	const taskInput = document.getElementById('task-input');
-// 	const taskList = document.getElementById('task-list');
-// 	let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+	function populateCategoryFilter() {
+		const categoryFilter = document.getElementById('categoryFilter');
+		categoryFilter.innerHTML = '<option value="all">All Categories</option>'; // Reset options
+		const categories = [...new Set(quotes.map((quote) => quote.category))];
+		categories.forEach((category) => {
+			const option = document.createElement('option');
+			option.value = category;
+			option.innerText = category;
+			categoryFilter.appendChild(option);
+		});
 
-// 	function loadTasks() {
-// 		tasks.forEach((taskText) => addTask(taskText, false));
-// 	}
+		const selectedCategory =
+			localStorage.getItem('selectedCategory') || 'all';
+		categoryFilter.value = selectedCategory;
+	}
 
-// 	function addTask(taskText, save = true) {
-// 		const listItem = document.createElement('li');
-// 		listItem.textContent = taskText;
+	function filterQuotes() {
+		const categoryFilter = document.getElementById('categoryFilter');
+		const selectedCategory = categoryFilter.value;
+		localStorage.setItem('selectedCategory', selectedCategory);
+		displayRandomQuote();
+	}
 
-// 		const removeButton = document.createElement('button');
-// 		removeButton.textContent = 'Remove';
-// 		removeButton.classList.add('remove-btn');
+	function addQuote() {
+		const newQuoteText = document.getElementById('newQuoteText').value;
+		const newQuoteCategory =
+			document.getElementById('newQuoteCategory').value;
+		if (newQuoteText && newQuoteCategory) {
+			quotes.push({ text: newQuoteText, category: newQuoteCategory });
+			saveQuotes();
+			populateCategoryFilter();
+			document.getElementById('newQuoteText').value = '';
+			document.getElementById('newQuoteCategory').value = '';
+			alert('Quote added successfully!');
+		} else {
+			alert('Please fill in both fields.');
+		}
+	}
 
-// 		removeButton.onclick = function () {
-// 			taskList.removeChild(listItem);
-// 			tasks = tasks.filter((task) => task !== taskText);
-// 			localStorage.setItem('tasks', JSON.stringify(tasks));
-// 		};
+	function exportToJsonFile() {
+		const blob = new Blob([JSON.stringify(quotes, null, 2)], {
+			type: 'application/json',
+		});
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = 'quotes.json';
+		a.click();
+		URL.revokeObjectURL(url);
+	}
 
-// 		listItem.appendChild(removeButton);
-// 		taskList.appendChild(listItem);
+	function importFromJsonFile(event) {
+		const fileReader = new FileReader();
+		fileReader.onload = function (event) {
+			const importedQuotes = JSON.parse(event.target.result);
+			quotes.push(...importedQuotes);
+			saveQuotes();
+			populateCategoryFilter();
+			alert('Quotes imported successfully!');
+		};
+		fileReader.readAsText(event.target.files[0]);
+	}
 
-// 		if (save) {
-// 			tasks.push(taskText);
-// 			localStorage.setItem('tasks', JSON.stringify(tasks));
-// 		}
+	document
+		.getElementById('newQuote')
+		.addEventListener('click', displayRandomQuote);
 
-// 		taskInput.value = '';
-// 	}
+	window.onload = function () {
+		populateCategoryFilter();
+		displayRandomQuote();
 
-// 	addButton.addEventListener('click', addTask);
-// 	taskInput.addEventListener('keypress', (event) => {
-// 		if (event.key === 'Enter') {
-// 			addTask();
-// 		}
-// 	});
+		const lastQuote = JSON.parse(sessionStorage.getItem('lastQuote'));
+		if (lastQuote) {
+			document.getElementById(
+				'quoteDisplay'
+			).innerText = `${lastQuote.text} - ${lastQuote.category}`;
+		}
+	};
 
-// 	loadTasks();
-// });
+	// Server Interaction Simulation
+	function syncWithServer() {
+		// Simulating fetching quotes from server (using a mock API like JSONPlaceholder)
+		fetch('https://jsonplaceholder.typicode.com/posts')
+			.then((response) => response.json())
+			.then((data) => {
+				const serverQuotes = data.slice(0, 5).map((post) => ({
+					text: post.title,
+					category: 'Server',
+				}));
+
+				// Conflict resolution: server data takes precedence
+				quotes = serverQuotes;
+				saveQuotes();
+				populateCategoryFilter();
+				displayRandomQuote();
+				alert('Quotes synced with server!');
+			});
+	}
+
+	// Periodic syncing
+	setInterval(syncWithServer, 60000); // Sync every 60 seconds
+});
