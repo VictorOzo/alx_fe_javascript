@@ -15,7 +15,7 @@ const quotes = [
 ];
 
 // Function to display a random quote
-function displayRandomQuote() {
+function showRandomQuote() {
 	if (quotes.length === 0) {
 		document.getElementById('quoteDisplay').innerText =
 			'No quotes available.';
@@ -48,10 +48,10 @@ function addQuote() {
 }
 
 // Event listener for the "Show New Quote" button
-document.getElementById('newQuote').addEventListener('click', displayRandomQuote);
+document.getElementById('newQuote').addEventListener('click', showRandomQuote);
 
 // Initial quote display
-displayRandomQuote();
+showRandomQuote();
 
 // document.addEventListener('DOMContentLoaded', () => {
 // 	// Load quotes from local storage or use a default array
