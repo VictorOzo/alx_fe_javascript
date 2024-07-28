@@ -1,11 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
-	let quotes = [
+	let quotes = JSON.parse(localStorage.getItem('quotes')) || [
 		{
 			text: 'The best way to predict the future is to invent it.',
 			category: 'Innovation',
 		},
 		{
-			text: 'You miss 100% of the shots you dont take.',
+			text: 'You miss 100% of the shots you don’t take.',
 			category: 'Opportunity',
 		},
 		{
@@ -13,6 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
 			category: 'Motivation',
 		},
 	];
+
+	// Function to save quotes to local storage
+	function saveQuotes() {
+		localStorage.setItem('quotes', JSON.stringify(quotes));
+	}
 
 	// Function to display a random quote
 	function displayRandomQuote() {
@@ -42,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 
 		quotes.push({ text: newQuoteText, category: newQuoteCategory });
+		saveQuotes();
 		document.getElementById('newQuoteText').value = '';
 		document.getElementById('newQuoteCategory').value = '';
 		alert('Quote added successfully!');
