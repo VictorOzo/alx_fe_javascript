@@ -70,12 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
 	function handleServerUpdate() {
 		const notification = document.getElementById('notification');
 		notification.style.display = 'block';
-		notification.innerText =
-			'Data has been updated from the server. Please review.';
+		notification.innerText = 'Quotes synced with server!';
 	}
 
 	// Sync local data with server and notify users
-	async function syncWithServer() {
+	async function syncQuotes() {
 		const serverQuotes = await fetchQuotesFromServer();
 		const localQuotes = JSON.parse(localStorage.getItem('quotes')) || [];
 
