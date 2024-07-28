@@ -15,6 +15,101 @@ document.addEventListener('DOMContentLoaded', () => {
 		},
 	];
 
+	// Define the server URL (mock API)
+	const serverUrl = 'https://jsonplaceholder.typicode.com/posts'; // Example URL
+
+	// Function to fetch quotes from the server
+	async function fetchFromServer() {
+		try {
+			const response = await fetch(serverUrl);
+			const data = await response.json();
+			return data.map((item) => ({ text: item.title, category: item.body })); // Adapt as needed
+		} catch (error) {
+			console.error('Error fetching data from server:', error);
+			return [];
+		}
+	}
+
+	// Function to post local quotes to the server
+	async function postToServer(quotes) {
+		try {
+			await fetch(serverUrl, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(quotes),
+			});
+		} catch (error) {
+			console.error('Error posting data to server:', error);
+		}
+	}
+
+	// Sync local quotes with server quotes
+	async function syncWithServer() {
+		const serverQuotes = await fetchFromServer();
+		const localQuotes = JSON.parse(localStorage.getItem('quotes')) || [];
+
+		// Conflict resolution: Server data takes precedence
+		const updatedQuotes = serverQuotes;
+
+		// Save updated quotes to local storage
+		localStorage.setItem('quotes', JSON.stringify(updatedQuotes));
+		quotes.length = 0;
+		quotes.push(...updatedQuotes);
+
+		// Update UI
+		populateCategories();
+		filterQuotes();
+	}
+
+	// Periodically fetch data from the server every 5 minutes (300000 ms)
+	setInterval(syncWithServer, 300000);
+
+	// Function to handle server updates and notify the user
+	function handleServerUpdate() {
+		const notification = document.getElementById('notification');
+		notification.style.display = 'block';
+		notification.innerText =
+			'Data has been updated from the server. Please review.';
+	}
+
+	// Sync local data with server and notify users
+	async function syncWithServer() {
+		const serverQuotes = await fetchFromServer();
+		const localQuotes = JSON.parse(localStorage.getItem('quotes')) || [];
+
+		// Simple conflict resolution: Server data takes precedence
+		const updatedQuotes = serverQuotes;
+
+		// Check if server data is different from local data
+		if (JSON.stringify(updatedQuotes) !== JSON.stringify(localQuotes)) {
+			handleServerUpdate();
+			localStorage.setItem('quotes', JSON.stringify(updatedQuotes));
+			quotes.length = 0;
+			quotes.push(...updatedQuotes);
+
+			// Update UI
+			populateCategories();
+			filterQuotes();
+		}
+	}
+
+	// Function to display a random quote
+	function displayRandomQuote() {
+		if (quotes.length === 0) {
+			document.getElementById('quoteDisplay').innerText =
+				'No quotes available.';
+			return;
+		}
+
+		const randomIndex = Math.floor(Math.random() * quotes.length);
+		const quote = quotes[randomIndex];
+		document.getElementById(
+			'quoteDisplay'
+		).innerText = `"${quote.text}" - ${quote.category}`;
+	}
+
 	// Function to save quotes to local storage
 	function saveQuotes() {
 		localStorage.setItem('quotes', JSON.stringify(quotes));
@@ -140,4 +235,5 @@ document.addEventListener('DOMContentLoaded', () => {
 	displayRandomQuote();
 	populateCategories();
 	filterQuotes();
+	syncWithServer();
 });
