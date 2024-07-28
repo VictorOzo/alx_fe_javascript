@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	const serverUrl = 'https://jsonplaceholder.typicode.com/posts'; // Example URL
 
 	// Function to fetch quotes from the server
-	async function fetchFromServer() {
+	async function fetchQuotesFromServer() {
 		try {
 			const response = await fetch(serverUrl);
 			const data = await response.json();
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// Sync local quotes with server quotes
 	async function syncWithServer() {
-		const serverQuotes = await fetchFromServer();
+		const serverQuotes = await fetchQuotesFromServer();
 		const localQuotes = JSON.parse(localStorage.getItem('quotes')) || [];
 
 		// Conflict resolution: Server data takes precedence
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// Sync local data with server and notify users
 	async function syncWithServer() {
-		const serverQuotes = await fetchFromServer();
+		const serverQuotes = await fetchQuotesFromServer();
 		const localQuotes = JSON.parse(localStorage.getItem('quotes')) || [];
 
 		// Simple conflict resolution: Server data takes precedence
