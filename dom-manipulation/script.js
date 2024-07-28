@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	// Sync local quotes with server quotes
-	async function syncWithServer() {
+	async function syncQuotes() {
 		const serverQuotes = await fetchQuotesFromServer();
 		const localQuotes = JSON.parse(localStorage.getItem('quotes')) || [];
 
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	// Periodically fetch data from the server every 5 minutes (300000 ms)
-	setInterval(syncWithServer, 300000);
+	setInterval(syncQuotes, 300000);
 
 	// Function to handle server updates and notify the user
 	function handleServerUpdate() {
@@ -235,5 +235,5 @@ document.addEventListener('DOMContentLoaded', () => {
 	displayRandomQuote();
 	populateCategories();
 	filterQuotes();
-	syncWithServer();
+	syncQuotes();
 });
