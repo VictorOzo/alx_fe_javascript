@@ -52,6 +52,24 @@ document.addEventListener('DOMContentLoaded', () => {
 		document.getElementById('newQuoteCategory').value = '';
 		alert('Quote added successfully!');
 	}
+	
+	// Function to export quotes as a JSON file
+	function exportQuotes() {
+		const blob = new Blob([JSON.stringify(quotes, null, 2)], {
+			type: 'application/json',
+		});
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = 'quotes.json';
+		a.click();
+		URL.revokeObjectURL(url);
+	}
+
+	// Event listener for the "Export Quotes" button
+	document
+		.getElementById('exportQuotes')
+		.addEventListener('click', exportQuotes);
 
 	// Event listener for the "Show New Quote" button
 	document
