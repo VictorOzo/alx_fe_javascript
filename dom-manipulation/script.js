@@ -1,37 +1,94 @@
-const quoteDisplay = document.getElementById('quoteDisplay');
-const newQuoteButton = document.getElementById('newQuote');
-const addQuoteForm = document.getElementById('addQuoteForm');
-const addQuoteButton = document.getElementById('addQuoteButton');
+document.addEventListener('DOMContentLoaded', toDoFunc);
 
-let quotes = [
-	{
-		text: 'The only way to do great work is to love what you do.',
-		author: 'Steve Jobs',
-		category: 'inspiration',
-	},
-	// ... more quotes
-];
+function toDoFunc() {
+	// Select DOM elements
+	const addButton = document.getElementById('add-task-btn');
+	const taskInput = document.getElementById('task-input');
+	const taskList = document.getElementById('task-list');
 
-function showRandomQuote() {
-	const randomIndex = Math.floor(Math.random() * quotes.length);
-	const randomQuote = quotes[randomIndex];
-	quoteDisplay.textContent = `${randomQuote.text} - ${randomQuote.author}`;
+	// Function to add a task
+	function addTask() {
+		const taskText = taskInput.value.trim();
+
+		if (taskText === '') {
+			alert('Please enter a task');
+			return;
+		}
+
+		// Create list item and remove button
+		const listItem = document.createElement('li');
+		listItem.textContent = taskText;
+
+		const removeButton = document.createElement('button');
+		removeButton.textContent = 'Remove';
+		removeButton.classList.add('remove-btn');
+
+		// Remove task function
+		removeButton.onclick = function () {
+			taskList.removeChild(listItem);
+		};
+
+		// Append elements to the DOM
+		listItem.appendChild(removeButton);
+		taskList.appendChild(listItem);
+
+		// Clear input field
+		taskInput.value = '';
+	}
+
+	// Event listeners
+	addButton.addEventListener('click', addTask);
+	taskInput.addEventListener('keypress', (event) => {
+		if (event.key === 'Enter') {
+			addTask();
+		}
+	});
+
+	// Initial task (optional)
+	addTask(); // Uncomment to add an initial task
 }
 
-function createAddQuoteForm() {
-	addQuoteForm.style.display = 'block';
-}
+// document.addEventListener('DOMContentLoaded', () => {
+// 	const addButton = document.getElementById('add-task-btn');
+// 	const taskInput = document.getElementById('task-input');
+// 	const taskList = document.getElementById('task-list');
+// 	let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
-function addQuote() {
-	const newQuoteText = document.getElementById('newQuoteText').value;
-	const newQuoteCategory = document.getElementById('newQuoteCategory').value;
-	const newQuote = { text: newQuoteText, category: newQuoteCategory };
-	quotes.push(newQuote);
-	// Clear input fields
-	document.getElementById('newQuoteText').value = '';
-	document.getElementById('newQuoteCategory').value = '';
-	// Optionally: display a success message or update the UI to show the new quote
-}
+// 	function loadTasks() {
+// 		tasks.forEach((taskText) => addTask(taskText, false));
+// 	}
 
-newQuoteButton.addEventListener('click', showRandomQuote);
-addQuoteButton.addEventListener('click', createAddQuoteForm);
+// 	function addTask(taskText, save = true) {
+// 		const listItem = document.createElement('li');
+// 		listItem.textContent = taskText;
+
+// 		const removeButton = document.createElement('button');
+// 		removeButton.textContent = 'Remove';
+// 		removeButton.classList.add('remove-btn');
+
+// 		removeButton.onclick = function () {
+// 			taskList.removeChild(listItem);
+// 			tasks = tasks.filter((task) => task !== taskText);
+// 			localStorage.setItem('tasks', JSON.stringify(tasks));
+// 		};
+
+// 		listItem.appendChild(removeButton);
+// 		taskList.appendChild(listItem);
+
+// 		if (save) {
+// 			tasks.push(taskText);
+// 			localStorage.setItem('tasks', JSON.stringify(tasks));
+// 		}
+
+// 		taskInput.value = '';
+// 	}
+
+// 	addButton.addEventListener('click', addTask);
+// 	taskInput.addEventListener('keypress', (event) => {
+// 		if (event.key === 'Enter') {
+// 			addTask();
+// 		}
+// 	});
+
+// 	loadTasks();
+// });
