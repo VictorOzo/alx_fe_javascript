@@ -14,13 +14,25 @@
 				font-size: 1.2em;
 				font-weight: bold;
 			}
-			input {
+			input,
+			button,
+			select {
 				margin-right: 10px;
+				margin-top: 10px;
 			}
 		</style>
 	</head>
 	<body>
 		<h1>Dynamic Quote Generator</h1>
+		<div>
+			<label for="categoryFilter">Filter by Category:</label>
+			<select id="categoryFilter" onchange="filterQuotes()">
+				<option value="all">All Categories</option>
+				<!-- Dynamically populated categories -->
+			</select>
+		</div>
+		<div id="notification" style="display: none; color: red"></div>
+
 		<div id="quoteDisplay">Click "Show New Quote" to display a quote.</div>
 		<button id="newQuote">Show New Quote</button>
 		<div>
@@ -32,6 +44,14 @@
 			/>
 			<button onclick="addQuote()">Add Quote</button>
 		</div>
+
+		<button id="exportQuotes">Export Quotes</button>
+		<input
+			type="file"
+			id="importFile"
+			accept=".json"
+			onchange="importFromJsonFile(event)"
+		/>
 		<script src="script.js"></script>
 	</body>
 </html>
